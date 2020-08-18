@@ -13,6 +13,8 @@ public class PrimeiraApiApplication {
 		SpringApplication app = new SpringApplication(PrimeiraApiApplication.class);
 	       app.setDefaultProperties(Collections.singletonMap("server.port", "8080")); // mudança de porta
 	       app.run(args);
+	       
+	       System.out.println("Hello worlds");
 	}
 
 }
