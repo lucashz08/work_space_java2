@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.serratec.correios.dominio.Cep;
+import org.serratec.correios.repositorio.CepRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,93 +23,105 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/cep")
 public class CepController {
 
-	private List<Cep> todos = new ArrayList<>();
+	@Autowired
+	private CepRepository repository;
 
 	public CepController() {
-		todos.add(new Cep("25954-000", "Rua Tenente Luis Meirelles", "RJ"));
-		todos.add(new Cep("25955-120", "Rua Santa Filomena", "RJ"));
-		todos.add(new Cep("25970-600", "Estrada Novo Circuito", "RJ"));
-		todos.add(new Cep("25970-490", "Estrada da Gruta", "RJ"));
-		todos.add(new Cep("25965-176", "Rua Doutor Oliveira", "RJ"));
 	}
 
 	@GetMapping("")
-	public List<Cep> getTodos(@RequestParam Map<String, String> parametros) { // pega o valores por query string ex: ?cpf=25957005
-		
+	public List<Cep> getTodos(@RequestParam Map<String, String> parametros) { // pega o valores por query string ex:
+																				// ?cpf=25957005
+		List<Cep> todos = (List<Cep>) repository.findAll();
 		List<Cep> filtrado = new ArrayList<>();
-		
-		for(Cep cep : todos) {
-			if(!parametros.getOrDefault("endereco", cep.getEndereco()).equals(cep.getEndereco())) {
+
+		for (Cep cep : todos) {
+
+			if (!parametros.getOrDefault("endereco", cep.getEndereco()).equals(cep.getEndereco())) {
 				continue;
 			}
-			if(!parametros.getOrDefault("uf", cep.getUf()).equals(cep.getUf())){
+
+			if (!parametros.getOrDefault("uf", cep.getUf()).equals(cep.getUf())) {
 				continue;
 			}
-			if(!parametros.getOrDefault("cep", cep.getNumero()).equals(cep.getNumero())) {
+
+			if (!parametros.getOrDefault("cep", cep.getNumero()).equals(cep.getNumero())) {
 				continue;
 			}
-			filtrado.add(cep);
+
+			if (!parametros.getOrDefault("cidade", cep.getCidade()).equals(cep.getCidade()))
+				continue;
+
+			if (!parametros.getOrDefault("bairro", cep.getBairro()).equals(cep.getBairro()))
+
+				filtrado.add(cep);
 		}
-		
+
 		return filtrado;
 	}
-
+	
+	@GetMapping("/")
+	public ResponseEntity<Cep> getCep()
+	{
+		return new ResponseEntity<Cep>(HttpStatus.NOT_FOUND);
+	}
+	
 	@GetMapping("/{numero}")
 	public ResponseEntity<Cep> getCep(@PathVariable String numero) { // pega o valor passado por depois da /
 
-		for (Cep cep : todos) {
-			if (cep.isSimilar(numero)) {
-				return new ResponseEntity<>(cep, HttpStatus.OK);
-			}
-		}
+		Cep cep = repository.findByNumero(numero);
+
+		if (cep != null)
+			return new ResponseEntity<>(cep, HttpStatus.OK);
 
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@PostMapping
 	public ResponseEntity<Cep> postCep(@RequestBody Cep novo) {
-		for (Cep cep : todos) {
-			if (cep.isSimilar(novo)) {
-				return new ResponseEntity<>(cep, HttpStatus.FORBIDDEN);
-			}
+		
+		Cep existente = repository.findByNumero(novo.getNumero());
+		
+		if(existente != null)
+			return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
-			if (novo.getEndereco().trim().equals("") || novo.getNumero().trim().equals(""))
-				return new ResponseEntity<>(novo, HttpStatus.FORBIDDEN);
-		}
-
-		todos.add(novo);
+		repository.save(novo);
 
 		return new ResponseEntity<>(novo, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/{numero}")
 	public ResponseEntity<Cep> putCep(@PathVariable String numero, @RequestBody Cep modificado) {
-		for (Cep cep : todos) {
-			if (cep.isSimilar(numero)) {
-				cep.setEndereco(modificado.getEndereco());
-				return new ResponseEntity<>(modificado, HttpStatus.ACCEPTED);
-			}
+	
+		Cep existente = repository.findByNumero(numero);
+		
+		if (existente != null) {
+			
+			existente.setEndereco(modificado.getEndereco());
+			existente.setUf(modificado.getUf());
+			existente.setBairro(modificado.getBairro());
+			existente.setCidade(modificado.getCidade());
+			//existente.setNumero(modificado.getNumero());
+			
+			repository.save(existente);
+			return new ResponseEntity<>(HttpStatus.ACCEPTED);
+
 		}
+		
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@DeleteMapping("/{numero}")
 	public ResponseEntity<Cep> deleteCep(@PathVariable String numero) {
-		for (Cep cep : todos) {
-			if (cep.isSimilar(numero)) {
-				todos.remove(cep);
+		
+		Cep ex = repository.findByNumero(numero);
+		
+		if(ex != null) {
 
-				return new ResponseEntity<>(HttpStatus.ACCEPTED);
-			}
+			repository.delete(ex);
+			return new ResponseEntity<>(ex, HttpStatus.ACCEPTED);
 		}
-
+		
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	}
-
-	@DeleteMapping("")
-	public ResponseEntity<Cep> deleteTodos() {
-		todos.clear();
-
-		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
