@@ -2,25 +2,31 @@ package org.serratec.correios.dominio;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="Cep") // muda o nome da tabela no banco de dados.
 public class Cep implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	private String numero;
-	
+
 	private String endereco;
+
+	@Column(name = "uf", length = 2) // renomeia e declara o tamanho da variavel.
 	private String uf;
+
 	private String cidade;
 	private String bairro;
-	
-	public Cep() {		
+
+	public Cep() {
 	}
-	
+
 	public Cep(String numero, String endereco, String uf, String cidade, String bairro) {
 		super();
 		this.numero = numero;
@@ -69,6 +75,5 @@ public class Cep implements Serializable {
 	public void setBairro(String bairro) {
 		this.bairro = bairro;
 	}
-	
-	
+
 }

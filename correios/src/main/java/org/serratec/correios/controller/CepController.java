@@ -77,6 +77,17 @@ public class CepController {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
+	@GetMapping("/uf/{uf}")
+	public ResponseEntity<List<Cep>> getUf(@PathVariable String uf){
+		
+		List<Cep> lista = repository.findAllByUf(uf);
+		
+		if(lista.isEmpty())
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		
+		return new ResponseEntity<>(lista, HttpStatus.OK);
+	}
+	
 	@PostMapping
 	public ResponseEntity<Cep> postCep(@RequestBody Cep novo) {
 		
@@ -124,4 +135,6 @@ public class CepController {
 		
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
+	
+
 }
