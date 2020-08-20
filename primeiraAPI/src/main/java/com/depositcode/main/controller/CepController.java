@@ -27,7 +27,7 @@ public class CepController {
 		
 	}
 	
-	@GetMapping("/")
+	@GetMapping("")
 	public List<Cep> getTodos(){
 		return todos;
 	}
