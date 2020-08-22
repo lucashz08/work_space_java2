@@ -1,6 +1,0 @@
-package com.depositcode.main;
-
-@RestController
-public class TesteController {
-
-}

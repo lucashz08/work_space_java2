@@ -18,7 +18,6 @@ public class PessoaOuEmpresa implements Serializable {
 	@Id
 	@Column(name = "ID", columnDefinition = "bigint")  // define o tipo de campo no caso Big Int
 	@GeneratedValue(strategy = GenerationType.IDENTITY) // define que o id e auto_increment
-	
 	private Integer id;
 
 	@Column(name = "NAME", length = 50)

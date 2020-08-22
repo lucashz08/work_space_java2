@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +31,7 @@ public class CepController {
 	}
 
 	@GetMapping("")
-	public List<Cep> getTodos(@RequestParam Map<String, String> parametros) { // pega o valores por query string ex:
+	public List<Cep> getTodos(@RequestParam Map<String, String> parametros /*, @RequestHeader(value = "Segredo") String token*/) { // cria um token pelo header // pega o valores por query string ex:
 																				// ?cpf=25957005
 		List<Cep> todos = (List<Cep>) repository.findAll();
 		List<Cep> filtrado = new ArrayList<>();
