@@ -1,31 +1,48 @@
 package net.depositcode.main.domain;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 
 @Entity
-public class Empresa {
-	
+public class Empresa implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	@Column (length = 50)
+
+	@NotNull
+	@Column(length = 50)
 	private String nomeFantasia;
-	@Column (length = 14, unique = true)
+
+	@NotNull
+	@Column(length = 14, unique = true)
 	private String cnpj;
+
+	@NotNull
 	@Past
-	@Column (columnDefinition = "Date")
+	@Column(columnDefinition = "Date")
 	private LocalDate dataCriacao;
-	
+
+	@OneToMany(mappedBy="empresa", cascade = CascadeType.REMOVE)
+	private List<Pessoas> pessoas = new ArrayList<>();
+
 	public Empresa() {
 	}
-	
+
 	public Empresa(Integer id, String nomeFantasia, String cnpj, LocalDate dataCriacao) {
 		super();
 		this.id = id;
@@ -66,6 +83,14 @@ public class Empresa {
 		this.dataCriacao = dataCriacao;
 	}
 
+	public List<Pessoas> getPessoas() {
+		return pessoas;
+	}
+
+	public void setPessoas(List<Pessoas> pessoas) {
+		this.pessoas = pessoas;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -90,5 +115,11 @@ public class Empresa {
 			return false;
 		return true;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Empresa [id=" + id + ", nomeFantasia=" + nomeFantasia + ", cnpj=" + cnpj + ", dataCriacao="
+				+ dataCriacao + ", pessoas=" + pessoas + "]";
+	}
+
 }
